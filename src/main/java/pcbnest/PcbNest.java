@@ -2,14 +2,15 @@ package pcbnest;
 
 
 
-import com.qunhe.util.nest.Nest;
-import com.qunhe.util.nest.data.NestPath;
+import com.sun.javafx.scene.shape.PathUtils;
+import nest4J.Nest;
+import nest4J.data.NestPath;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.qunhe.util.nest.data.*;
-import com.qunhe.util.nest.util.*;
+import nest4J.data.*;
+import nest4J.util.*;
 import de.lighti.clipper.Path;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -28,10 +29,43 @@ public class PcbNest {
             //testTriangle();
             testL();
             //testSample();
+            //testArea();
         } catch (Exception e) {
             System.out.println("Exception : " + e);
         }
     }
+
+    public static void testArea() {
+
+        NestPath binPolygon = new NestPath();
+        double width = 220;
+        double height = 105;
+        binPolygon.add(0, 0);
+        binPolygon.add(0, height);
+        binPolygon.add(width, height);
+        binPolygon.add(width, 0);
+        NestPath L1 = new NestPath();
+        L1.add(0, 1000);
+        L1.add(100, 1000);
+        L1.add(100, 1200);
+        L1.add(200, 1200);
+        L1.add(200, 1400);
+        L1.add(0, 1400);
+
+        System.out.println("L1 Area = " + GeometryUtil.polygonArea(L1));
+        NestPath L2 = new NestPath();
+        L2.add(1000, 0);
+        L2.add(1100, 000);
+        L2.add(1100, 100);
+        L2.add(1200, 100);
+        L2.add(1200, 200);
+        L2.add(1000, 200);
+
+        System.out.println("L2 Area = " + GeometryUtil.polygonArea(L2));
+
+    }
+
+
     public static void test1() {
 
         NestPath binPolygon = new NestPath();
@@ -152,9 +186,9 @@ public class PcbNest {
         //todo calculate usage
         double usedArea  = 0.0;
         for(NestPath path : list) {
-            usedArea = getArea(path) + usedArea;
+            usedArea = GeometryUtil.polygonArea(path) + usedArea;
         }
-        double rate = usedArea/getArea(binPolygon);
+        double rate = usedArea/GeometryUtil.polygonArea(binPolygon);
         System.out.println("Usage = " + rate);
         return;
     }
@@ -234,9 +268,9 @@ public class PcbNest {
         //todo calculate usage
         double usedArea  = 0.0;
         for(NestPath path : list) {
-            usedArea = getArea(path) + usedArea;
+            usedArea = GeometryUtil.polygonArea(path) + usedArea;
         }
-        double rate = usedArea/getArea(binPolygon);
+        double rate = usedArea/GeometryUtil.polygonArea(binPolygon);
         System.out.println("Usage = " + rate);
         return;
     }
@@ -262,7 +296,7 @@ public class PcbNest {
         L1.add(200, 1200);
         L1.add(0, 1200);
 
-        L1.setRotation(12);
+        L1.setRotation(4);
         L1.bid = 1;
 
         // add another L shape that take 3/4 of the 200X 200
@@ -274,7 +308,7 @@ public class PcbNest {
         L2.add(200, 2200);
         L2.add(0, 2200);
 
-        L2.setRotation(12);
+        L2.setRotation(4);
         L2.bid = 2;
 
         // add another L shape that take 3/4 of the 200X 200
@@ -286,7 +320,7 @@ public class PcbNest {
         L3.add(200, 3200);
         L3.add(0, 3200);
 
-        L3.setRotation(12);
+        L3.setRotation(4);
         L3.bid = 3;
 
         // add another L shape that take 3/4 of the 200X 200
@@ -298,7 +332,7 @@ public class PcbNest {
         L4.add(200, 4200);
         L4.add(0, 4200);
 
-        L4.setRotation(12);
+        L4.setRotation(4);
         L4.bid = 4;
 
         List<NestPath> list = new ArrayList<NestPath>();
@@ -314,8 +348,18 @@ public class PcbNest {
         config.POPULATION_SIZE=10;
         config.CLIIPER_SCALE=10000;
         config.CURVE_TOLERANCE = 0.0;
-        Nest nest = new Nest(binPolygon, list, config, 2500);
-        List<List<Placement>> appliedPlacement = nest.startNest();
+        Nest nest = new Nest(binPolygon, list, config, 500);
+        List<List<Placement>> appliedPlacement = null;
+        appliedPlacement = nest.startNest();
+        if(null == appliedPlacement || appliedPlacement.size() == 0 ) {
+            System.out.println("Size = " + appliedPlacement.size());
+        } else {
+            while (appliedPlacement.size() > 1) {
+                System.out.println("Size = " + appliedPlacement.size());
+                nest = new Nest(binPolygon, list, config, 50);
+                appliedPlacement = nest.startNest();
+            }
+        }
         List<String> strings = null;
         try {
             strings = SvgUtil.svgGenerator(list, appliedPlacement, width, height);
@@ -330,9 +374,9 @@ public class PcbNest {
         //todo calculate usage
         double usedArea  = 0.0;
         for(NestPath path : list) {
-            usedArea = getArea(path) + usedArea;
+            usedArea = GeometryUtil.polygonArea(path) + usedArea;
         }
-        double rate = usedArea/getArea(binPolygon);
+        double rate = usedArea/GeometryUtil.polygonArea(binPolygon);
         System.out.println("Usage = " + rate);
         return;
     }
@@ -419,8 +463,4 @@ public class PcbNest {
         writer.close();
     }
 
-    private static double getArea(NestPath aInPath) {
-        Path path = CommonUtil.NestPath2Path(aInPath);
-        return path.area();
-    }
 }
