@@ -1,42 +1,38 @@
-package pcbnest.utils;
+package pcbnest.svg;
 
 
-import java.io.IOException;
-
+import javafx.scene.shape.Polygon;
+import nest4J.Nest;
+import nest4J.data.NestPath;
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
 import org.apache.batik.anim.dom.SVGOMPathElement;
 import org.apache.batik.anim.dom.SVGPathSupport;
+import org.apache.batik.bridge.*;
+import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.dom.svg.SVGPathSegItem;
-import org.apache.batik.util.XMLResourceDescriptor;
-import org.apache.batik.bridge.BridgeContext;
-import org.apache.batik.bridge.DocumentLoader;
-import org.apache.batik.bridge.GVTBuilder;
-import org.apache.batik.bridge.UserAgent;
-import org.apache.batik.bridge.UserAgentAdapter;
-import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.gvt.GraphicsNode;
-
-import org.w3c.dom.Document;
+import org.apache.batik.util.XMLResourceDescriptor;
 import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGPathSegList;
 import org.w3c.dom.svg.SVGPoint;
 
-
-import java.io.*;
-import java.net.URI;
-import java.util.ArrayList;
-
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
 
-public class Converter {
+public class SvgConverter {
 
     /**
      * Conveter curve
@@ -72,7 +68,7 @@ public class Converter {
     /**
      * Constructor
      */
-    Converter(int in_separate_points){
+    SvgConverter(int in_separate_points){
         pathPoints = new ArrayList<ArrayList<SVGPoint>>();
         separate_points = in_separate_points;
     }
@@ -179,6 +175,8 @@ public class Converter {
             e.printStackTrace();
         }
 
+        normalize();
+
     }
 
     private void writePolygonSvg(String filename){
@@ -267,6 +265,57 @@ public class Converter {
     }
 
 
+    public void normalize() {
+        float minX = 0.0f;
+        float minY = 0.0f;
+        //find min
+        for(int i =0; i < pathPoints.size(); i++){
+            for(int j = 0; j < pathPoints.get(i).size(); j++ ) {
+                SVGPoint lPoint = (SVGPoint) (pathPoints.get(i).get(j));
+                minX = minX < lPoint.getX() ? minX : lPoint.getX();
+                minY = minY < lPoint.getY() ? minY : lPoint.getY();
+            }
+        }
+
+        //shift so all are positive
+        for(int i=0; i < pathPoints.size(); i++){
+            for(int j = 0; j < pathPoints.get(i).size(); j++ ) {
+                SVGPoint lPoint = (SVGPoint) (pathPoints.get(i).get(j));
+                if (minX < 0.0F) {
+                    lPoint.setX(lPoint.getX() - minX);
+                }
+                if (minY < 0.0F) {
+                    lPoint.setY(lPoint.getY() - minY);
+                }
+            }
+        }
+    }
+    public static NestPath getNestPathFromSvg(String aInSvgFileName) {
+        SvgConverter cv =  new SvgConverter(5);
+        cv.readPathSvg(aInSvgFileName);
+        NestPath lPath = new NestPath();
+        ArrayList<ArrayList<SVGPoint>> lPoints = cv.pathPoints;
+        for(int i =0; i < lPoints.size(); i++) {
+            for (int j = 0; j < lPoints.get(i).size(); j++) {
+                lPath.add(lPoints.get(i).get(j).getX(), lPoints.get(i).get(j).getY());
+            }
+        }
+        return lPath;
+    }
+
+    public static Polygon getPolygonFromSvg(String aInSvgFileName) {
+        SvgConverter cv =  new SvgConverter(5);
+        cv.readPathSvg(aInSvgFileName);
+
+        Polygon lPolygon = new Polygon();
+        ArrayList<ArrayList<SVGPoint>> lPoints = cv.pathPoints;
+        for(int i =0; i < lPoints.size(); i++) {
+            for (int j = 0; j < lPoints.get(i).size(); j++) {
+                lPolygon.getPoints().addAll((double) (lPoints.get(i).get(j).getX()), (double) (lPoints.get(i).get(j).getY()));
+            }
+        }
+        return lPolygon;
+    }
     public static void main(String [] args) throws IOException {
 
         /*if(args.length != 3){
@@ -274,14 +323,14 @@ public class Converter {
             System.exit(-1);
         }*/
 
-        String in_filename = "/opt/LI/nesting/pcb_nest/in/028124-5.svg";
-        //String in_filename = "/opt/LI/nesting/pcb_nest/in/020671-1.svg";
+        //String in_filename = "/opt/LI/nesting/pcb_nest/in/028124-5.svg";
+        String in_filename = "/opt/LI/nesting/pcb_nest/in/020671.svg";
         String out_filename = "/opt/LI/nesting/pcb_nest/out/test1.svg";
         int separation_points = 5;
 
         System.out.println("In:"+in_filename+", Out:"+ out_filename);
 
-        Converter cv =  new Converter(separation_points);
+        SvgConverter cv =  new SvgConverter(separation_points);
         /*String lOutFile = PolylineUtils.convertFileToSvgFile(in_filename,
                 new Bound(CommonUtils.vew_port_startX, CommonUtils.vew_port_startY, CommonUtils.vew_port_width, CommonUtils.vew_port_hight ));*/
         //cv.readPathSvg(lOutFile);

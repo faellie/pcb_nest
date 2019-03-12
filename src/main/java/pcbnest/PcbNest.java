@@ -3,10 +3,15 @@ package pcbnest;
 
 
 import com.sun.javafx.scene.shape.PathUtils;
+import javafx.scene.Node;
+import javafx.scene.shape.Polygon;
 import nest4J.Nest;
 import nest4J.data.NestPath;
 
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import nest4J.data.*;
@@ -16,10 +21,9 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
+import pcbnest.common.PartRatio;
+import pcbnest.common.ShapeUtils;
+import pcbnest.gui.javafx.panel.ConfigPanel;
 
 public class PcbNest {
 
@@ -443,8 +447,9 @@ public class PcbNest {
         return nestPaths;
     }
 
-    private static void  saveSvgFile(List<String> strings) throws Exception {
+    private static String  saveSvgFile(List<String> strings) throws Exception {
         File f = new File("out/test.html");
+        String ret = "";
         if (!f.exists()) {
             f.createNewFile();
         }
@@ -456,11 +461,77 @@ public class PcbNest {
                 " \n" +
                 "<svg width=\"100%\" height=\"100%\" version=\"1.1\"\n" +
                 "xmlns=\"http://www.w3.org/2000/svg\">\n");
+        ret  = ret + "<?xml version=\"1.0\" standalone=\"no\"?>\n" +
+                "\n" +
+                "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \n" +
+                "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n" +
+                " \n" +
+                "<svg width=\"100%\" height=\"100%\" version=\"1.1\"\n" +
+                "xmlns=\"http://www.w3.org/2000/svg\">\n";
         for(String s : strings){
             writer.write(s);
+            ret  = ret + s;
         }
         writer.write("</svg>");
         writer.close();
+        return ret;
     }
 
+    public static String nest(ConfigPanel configPanel, List<PartRatio> aInPartList) {
+
+        double lCurrY = 0.0;
+        //set the mainboard
+        NestPath mainBin = ShapeUtils.createNestPath(configPanel.getMainBoard(), lCurrY);
+        lCurrY = lCurrY + mainBin.getMaxY();
+        mainBin.bid = 0;
+
+        //setup each pcb board
+        List<NestPath> list = new ArrayList<NestPath>();
+        int bidCount = 0;
+        for(PartRatio lPartRatio : aInPartList) {
+            for(int dup = 0; dup < lPartRatio.getRatio(); dup ++) {
+                NestPath lNextBin =  ShapeUtils.createNestPath(lPartRatio.getPolygon(), lCurrY);
+                lCurrY = lNextBin.getMaxY() + 10.0;
+                lNextBin.bid = bidCount ++ ;
+                list.add(lNextBin);
+            }
+        }
+
+        Config config = new Config();
+        config.USE_HOLE = true;
+        config.SPACING = 0.0;
+        config.POPULATION_SIZE=4;
+        config.CLIIPER_SCALE=10000;
+        config.CURVE_TOLERANCE = 0.0;
+        Nest nest = new Nest(mainBin, list, config, 100);
+        List<List<Placement>> appliedPlacement = null;
+        appliedPlacement = nest.startNest();
+        if(null == appliedPlacement || appliedPlacement.size() == 0 ) {
+            System.out.println("Size = " + appliedPlacement.size());
+        } else {
+            int repeat = 0;
+            while (appliedPlacement.size() > 1 && repeat < 1000) {
+                System.out.println("Size = " + appliedPlacement.size());
+                nest = new Nest(mainBin, list, config, 50);
+                repeat = repeat + 50;
+                appliedPlacement = nest.startNest();
+            }
+        }
+        List<String> strings = null;
+        try {
+            strings = SvgUtil.svgGenerator(list, appliedPlacement, configPanel.getConfig().getWidth(),  configPanel.getConfig().getHight());
+            String lStr = "";
+            for(String str : strings) {
+                lStr = lStr + str;
+            }
+            InputStream is = new ByteArrayInputStream( lStr.getBytes( Charset.defaultCharset()));
+            //todo load into DOC
+
+            return saveSvgFile(strings);
+        } catch (Exception e) {
+            System.out.println("nest() : error tp generate SVG str " + e);
+            return "";
+        }
+
+    }
 }

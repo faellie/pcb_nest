@@ -1,0 +1,28 @@
+{
+  "width": 550,
+  "hight":350,
+  "parts" :[
+
+    {
+      "filename": "/opt/LI/nesting/pcb_nest/in/020671-1.svg",
+      "colorcode": "yellow",
+      "dups": 3,
+      "layer":"020671-1ROU_GBR"
+    },
+    {
+      "filename": "/opt/LI/nesting/pcb_nest/in/028124-5.svg",
+      "colorcode": "yellow",
+      "dups": 3,
+      "layer":"028124-5ROU_GBR"
+    },
+    {
+      "filename": "/opt/LI/nesting/pcb_nest/in/068162-3.svg",
+      "colorcode": "yellow",
+      "dups": 3,
+      "layer":"068162-3ROU_GBR"
+    }
+  ]
+
+
+}
+
