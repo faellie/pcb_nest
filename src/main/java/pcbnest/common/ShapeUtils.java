@@ -31,7 +31,7 @@ public class ShapeUtils {
         return polygon;
     }
 
-    public static NestPath createNestPath(Polygon aInPolygon, double offsetY) {
+    public static NestPath createNestPath(Polygon aInPolygon, double offsetY, int rotation) {
         NestPath lPath = new NestPath();
         List<Double> lList = aInPolygon.getPoints();
         int size = lList.size();
@@ -42,6 +42,7 @@ public class ShapeUtils {
         for(int i = 0; i < size/2; i++) {
             lPath.add(lList.get(i*2), lList.get(i*2 + 1) + offsetY);
         }
+        lPath.setRotation(rotation);
         return lPath;
     }
 }

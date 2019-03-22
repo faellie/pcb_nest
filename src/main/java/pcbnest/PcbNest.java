@@ -481,7 +481,7 @@ public class PcbNest {
 
         double lCurrY = 0.0;
         //set the mainboard
-        NestPath mainBin = ShapeUtils.createNestPath(configPanel.getMainBoard(), lCurrY);
+        NestPath mainBin = ShapeUtils.createNestPath(configPanel.getMainBoard(), lCurrY, 0);
         lCurrY = lCurrY + mainBin.getMaxY();
         mainBin.bid = 0;
 
@@ -490,7 +490,7 @@ public class PcbNest {
         int bidCount = 0;
         for(PartRatio lPartRatio : aInPartList) {
             for(int dup = 0; dup < lPartRatio.getRatio(); dup ++) {
-                NestPath lNextBin =  ShapeUtils.createNestPath(lPartRatio.getPolygon(), lCurrY);
+                NestPath lNextBin =  ShapeUtils.createNestPath(lPartRatio.getPolygon(), lCurrY, 4);
                 lCurrY = lNextBin.getMaxY() + 10.0;
                 lNextBin.bid = bidCount ++ ;
                 list.add(lNextBin);
@@ -503,7 +503,7 @@ public class PcbNest {
         config.POPULATION_SIZE=4;
         config.CLIIPER_SCALE=10000;
         config.CURVE_TOLERANCE = 0.0;
-        Nest nest = new Nest(mainBin, list, config, 100);
+        Nest nest = new Nest(mainBin, list, config, 20);
         List<List<Placement>> appliedPlacement = null;
         appliedPlacement = nest.startNest();
         if(null == appliedPlacement || appliedPlacement.size() == 0 ) {
@@ -512,8 +512,8 @@ public class PcbNest {
             int repeat = 0;
             while (appliedPlacement.size() > 1 && repeat < 1000) {
                 System.out.println("Size = " + appliedPlacement.size());
-                nest = new Nest(mainBin, list, config, 50);
-                repeat = repeat + 50;
+                nest = new Nest(mainBin, list, config, 20);
+                repeat = repeat + 20;
                 appliedPlacement = nest.startNest();
             }
         }

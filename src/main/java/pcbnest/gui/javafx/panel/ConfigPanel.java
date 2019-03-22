@@ -10,6 +10,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import org.dom4j.DocumentException;
@@ -51,12 +52,18 @@ public class ConfigPanel {
         this.config = config;
         mainBoard = ConfigUtils.getMainPcb(config);
         mainBoard.setFill(Color.GREEN);
+
+        //scale down for better display
+        mainBoard.setScaleX(0.4);
+        mainBoard.setScaleY(0.4);
         Group svgMain = new Group(mainBoard);
         Label labelMain = new Label("Main Board");
 
         Label lNumber = new Label("Numbuer used");
         TextField lTextNumber = new TextField("1");
-        HBox lMainBox = new HBox(50, svgMain, labelMain, lNumber, lTextNumber);
+        StackPane svgMainWithTxt = new StackPane();
+        svgMainWithTxt.getChildren().addAll(new Group(mainBoard), new Label("Main Board"));
+        HBox lMainBox = new HBox(50, svgMainWithTxt,  lNumber, lTextNumber);
         lMainBox.setAlignment(Pos.CENTER);
         gridPane.add(lMainBox, 0, 0);
 
@@ -67,8 +74,10 @@ public class ConfigPanel {
             Label label = new Label("Number");
             TextField textField = new TextField();
             textField.setText(Integer.toString(lPartRatio.getRatio()));
-            HBox lPartBox = new HBox(svgPolygon, label, textField);
-
+            StackPane svgPolygonWithTxt = new StackPane();
+            svgPolygonWithTxt.getChildren().addAll(new Group(lPartRatio.getPolygon()), new Label(lPartRatio.getName()) );
+            HBox lPartBox = new HBox(50, svgPolygonWithTxt, label, textField);
+            lPartBox.setAlignment(Pos.CENTER);
             gridPane.add(lPartBox, 0, row ++);
         }
     }

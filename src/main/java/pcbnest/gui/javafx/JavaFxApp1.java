@@ -16,6 +16,8 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import pcbnest.PcbNest;
@@ -63,19 +65,30 @@ public class JavaFxApp1 extends Application {
         ConfigPanel lConfigPanel = new ConfigPanel(lConfig);
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setContent(lConfigPanel.getGridPane());
-        mainPanel.add(scrollPane, 0, 1);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPrefViewportWidth(600);
+        scrollPane.setPrefViewportHeight(400);
+        mainPanel.add(scrollPane, 0, 1, 1, 1);
         //mainPanel.add(new Group(ShapeUtils.createPolygon()), 0, 2);
 
 
         //output panel
 
         String lSvgStr = PcbNest.nest(lConfigPanel, lConfigPanel.getPartList());
+        System.out.println(lSvgStr);
 
 
-        Group svgPolygon = new Group(ShapeUtils.createPolygon());
-        //todo we suppose to do somehting with e str, but...later
+        WebView browser = new WebView();
+        //todo we suppose to do somehting with the str, but...later
+        //Group svgPolygon = new Group(ShapeUtils.createPolygon());
         //Group svgPolygon = new Group(PcbNest.nest(lConfigPanel.getMainBoard(), lConfigPanel.getPartList()));
-        mainPanel.add(svgPolygon, 1, 1);
+        WebEngine webEngine = browser.getEngine();
+        webEngine.loadContent(lSvgStr);
+        ScrollPane resultPanle = new ScrollPane();
+        resultPanle.setStyle("-fx-background-color: white");
+        resultPanle.setContent(browser);
+        mainPanel.add(resultPanle, 1, 1, 2, 1);
 
         Scene scene = new Scene(mainPanel);
 

@@ -37,7 +37,10 @@ public class ConfigUtils {
             //todo for now assume we have svg files contains the path, and we converter to polygon
             Polygon lPolygon = SvgConverter.getPolygonFromSvg(partConfig.getFilename());
             lPolygon.setFill(getColor(partConfig.getColorcode()));
-            PartRatio lPartRatio  = new PartRatio(lPolygon, partConfig.getDups());
+            File lFile = new File(partConfig.getFilename());
+            String lName = lFile.getName();
+            lName = lName.substring(0, lName.indexOf("."));
+            PartRatio lPartRatio  = new PartRatio(lPolygon, lName, partConfig.getDups());
 
             list.add(lPartRatio);
 

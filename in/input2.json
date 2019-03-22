@@ -6,19 +6,19 @@
     {
       "filename": "/opt/LI/nesting/pcb_nest/in/020671-1.svg",
       "colorcode": "yellow",
-      "dups": 3,
+      "dups": 4,
       "layer":"020671-1ROU_GBR"
     },
     {
       "filename": "/opt/LI/nesting/pcb_nest/in/028124-5.svg",
-      "colorcode": "yellow",
-      "dups": 3,
+      "colorcode": "green",
+      "dups": 10,
       "layer":"028124-5ROU_GBR"
     },
     {
       "filename": "/opt/LI/nesting/pcb_nest/in/068162-3.svg",
-      "colorcode": "yellow",
-      "dups": 3,
+      "colorcode": "red",
+      "dups": 8,
       "layer":"068162-3ROU_GBR"
     }
   ]
