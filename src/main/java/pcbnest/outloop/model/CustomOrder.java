@@ -1,6 +1,7 @@
 package pcbnest.outloop.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import pcbnest.outloop.utils.Comparators;
 
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.Collections;
 public class CustomOrder {
     private ArrayList<PcbBoard> pcbBoards = new ArrayList<>();
     private ArrayList<BaseBoard> baseBoards = new ArrayList<>();
-
+    private Double maxFitRate = 0.95;
     /**
      * We should always try to construct the order completly in one call.
      * The two list should not be changed after construction
@@ -22,11 +23,15 @@ public class CustomOrder {
         sort();
     }
 
+    public CustomOrder() {
+    }
+
     /**
      * sort the internal list based on area
      */
     private void sort(){
-        Collections.sort(pcbBoards, Comparators.compareShape);
+        Collections.sort(pcbBoards, Comparators.compareArea);
+        Collections.sort(baseBoards, Comparators.compareArea);
     }
 
 
@@ -46,6 +51,15 @@ public class CustomOrder {
         this.baseBoards = baseBoards;
     }
 
+    public Double getMaxFitRate() {
+        return maxFitRate;
+    }
+
+    public void setMaxFitRate(Double maxFitRate) {
+        this.maxFitRate = maxFitRate;
+    }
+
+    @JsonIgnore
     public int getToutalCount() {
         int toutalCount = 0;
         for(PcbBoard pcb : pcbBoards) {
@@ -62,5 +76,16 @@ public class CustomOrder {
             lRet.add(lClone);
         }
         return lRet;
+    }
+
+    public String toString() {
+
+        String lRet = "\n\tBaseBoardID : " + getBaseBoards().get(0).getId() + "(A:" + getBaseBoards().get(0).getArea() + ")\n\t";
+        for(PcbBoard pcb : getPcbBoards()) {
+            lRet = lRet + "(" +pcb.getId() + " A:" + pcb.getArea() + ") X " + pcb.getCount() + "; ";
+        }
+        lRet = lRet + "]";
+        return  lRet;
+
     }
 }

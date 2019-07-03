@@ -28,6 +28,9 @@ dependencies {
     compile('org.codehaus.jackson:jackson-core-asl:1.8.6')
     compile('org.codehaus.jackson:jackson-mapper-asl:1.8.6')
 
+    compile('com.fasterxml.jackson.core:jackson-databind:2.8.6')
+
+
 }
 
 task convert(type: Jar) {
@@ -85,3 +88,30 @@ task pcbnest(type: Jar) {
     }
     exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
 }
+
+task loop1(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'pcbnest.outloop.test.Test1'
+    }
+    //archiveName = "yourjar.jar"
+    classifier 'loop1'
+    appendix = 'loop1'
+    archiveName = "loop1.${extension}"
+    from {
+        configurations.runtime.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+
+        configurations.compile.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    from (sourceSets.main.output) {
+        include 'pcbnest/outloop/'
+    }
+    from (sourceSets.main.resources) {
+        include '*'
+    }
+    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
+}
+

@@ -6,11 +6,11 @@ import pcbnest.outloop.model.WorkOrder;
 
 import java.util.ArrayList;
 
-public class Generic {
+public class CommonUtils {
 
-    public static PcbBoard getWithId(ArrayList<PcbBoard> aInPcbBoardList, int aInId) {
+    public static PcbBoard getWithId(ArrayList<PcbBoard> aInPcbBoardList, String aInId) {
         for(PcbBoard pcb : aInPcbBoardList ) {
-            if(pcb.getId() == aInId) {
+            if(pcb.getId().equals(aInId)) {
                 return pcb;
             }
         }
@@ -28,9 +28,9 @@ public class Generic {
     }
 
     public static String printWorkOrders(ArrayList<WorkOrder> workOrders) {
-        String lines = "\n";
+        String lines = "\n\t";
         for(WorkOrder lWorkOrder : workOrders) {
-            lines = lines + lWorkOrder.toString() + "\n";
+            lines = lines + lWorkOrder.toString() + "\n\t";
         }
         return lines;
     }

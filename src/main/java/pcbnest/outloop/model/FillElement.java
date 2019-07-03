@@ -4,19 +4,21 @@ package pcbnest.outloop.model;
 import java.util.ArrayList;
 
 public class FillElement {
-    private int pcbId;
+    private String pcbId;
     private int count;
+    private double area;
 
-    public FillElement(int pcbId, int count) {
+    public FillElement(String pcbId, int count, double area) {
         this.pcbId = pcbId;
         this.count = count;
+        this.area = area;
     }
 
-    public int getPcbId() {
+    public String getPcbId() {
         return pcbId;
     }
 
-    public void setPcbId(int pcbId) {
+    public void setPcbId(String pcbId) {
         this.pcbId = pcbId;
     }
 
@@ -26,5 +28,13 @@ public class FillElement {
 
     public void setCount(int count) {
         this.count = count;
+    }
+
+    public double getArea() {
+        return area;
+    }
+
+    public void setArea(double area) {
+        this.area = area;
     }
 }

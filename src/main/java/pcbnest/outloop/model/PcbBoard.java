@@ -6,13 +6,20 @@ import java.util.ArrayList;
 public class PcbBoard extends Shape{
     //how many is required
     private int count;
-    private int id;
 
-    public PcbBoard(double area, int count, int id) {
+    //id should be linked to the file name of the svg/dxf file
+    private String id;
+
+    public PcbBoard(double area, int count, String id) {
         super(area);
         this.count = count;
         this.id = id;
     }
+
+    public PcbBoard() {
+        super();
+    }
+
 
     public int getCount() {
         return count;
@@ -22,11 +29,11 @@ public class PcbBoard extends Shape{
         this.count = count;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -1,21 +1,22 @@
-package pcbnest.outloop.logic;
+package pcbnest.outloop.core;
 
 
 import pcbnest.outloop.model.*;
 import pcbnest.outloop.utils.Comparators;
-import pcbnest.outloop.utils.Generic;
+import pcbnest.outloop.utils.CommonUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 
 public class Fit {
     private CustomOrder customOrder;
 
     //todo configuration or...
-    private Double fitRate = 0.9;
 
     //this is the final results
     private ArrayList<Partern> fits = new ArrayList<>();
+
     public Fit(CustomOrder customOrder) {
         this.customOrder = customOrder;
     }
@@ -25,40 +26,46 @@ public class Fit {
 
         ArrayList<PcbBoard> targetList = customOrder.clonePcbBoards();
         ArrayList<WorkOrder> workOrders = new ArrayList<>();
-        Collections.sort(targetList, Comparators.comparePcbBoard);
+
+        //todo can sort in different ways for different output
+        Collections.sort(targetList, Comparators.compareCount);
 
 
 
         //now we add to the work order
-        while (!Generic.noMorePart(targetList)) {
+        while (!CommonUtils.noMorePart(targetList)) {
             WorkOrder lWorkOrder = nextWorkOrder(targetList);
             workOrders.add(lWorkOrder);
         }
-        System.out.print("Final work order : " + Generic.printWorkOrders(workOrders));
+        System.out.print("Final work order : " + CommonUtils.printWorkOrders(workOrders));
     }
 
 
 
     private WorkOrder nextWorkOrder(ArrayList<PcbBoard> aInTargetList ) {
         Double usedArea = 0.0;
-
+        Double usedPercent = 0.0;
         //todo only use first
         Partern lPartern = Partern.initPartern(customOrder.getBaseBoards().get(0), customOrder);
-        boolean foundFit = true;
+        boolean canFit = true;
 
         //try to fit as much as possible
-        while(foundFit) {
-            foundFit = false;
+        while(canFit) {
+            canFit = false;
             for (int index = 0; index < aInTargetList.size(); index++) {
                 PcbBoard nextPcb = aInTargetList.get(index);
                 if(nextPcb.getCount() > 0) {
-                    usedArea = usedArea + nextPcb.getArea();
-                    //todo we only work on first out board (the largest) for now
-                    if (usedArea < customOrder.getBaseBoards().get(0).getArea() * fitRate) {
-                        //add this from target list to  selectedList
-                        lPartern.increCount(nextPcb.getId());
-                        nextPcb.decreCount();
-                        foundFit = true;
+                    //todo we only work on first outboard (the largest) for now
+                    if (usedArea + nextPcb.getArea() < customOrder.getBaseBoards().get(0).getArea() * customOrder.getMaxFitRate()) {
+                        //take a decision based on the count to fit this one or not
+                        canFit = true;
+                        if(doAdd(nextPcb, aInTargetList)) {
+                            //add this from target list to  selectedList
+                            lPartern.increCount(nextPcb.getId());
+                            nextPcb.decreCount();
+                            usedArea = usedArea + nextPcb.getArea();
+                            usedPercent = (usedArea * 100.00) / customOrder.getBaseBoards().get(0).getArea();
+                        }
                     } else {
                         //can not fit this pcb in, move to next
                     }
@@ -73,7 +80,7 @@ public class Fit {
         ArrayList<FillElement> fillElements = lPartern.getPcb();
         for(FillElement lElement : fillElements) {
             //PcbBoard lPcb = targetList.stream().filter((a)->a.getId() == lElement.getPcbId());
-            PcbBoard lPcb = Generic.getWithId(aInTargetList, lElement.getPcbId());
+            PcbBoard lPcb = CommonUtils.getWithId(aInTargetList, lElement.getPcbId());
             if(lElement.getCount() != 0) {
                 dup = dup > lPcb.getCount() / lElement.getCount() ? lPcb.getCount() / lElement.getCount() : dup;
             }
@@ -82,7 +89,7 @@ public class Fit {
             //update targetList
             for(FillElement lElement : fillElements) {
                 //PcbBoard lPcb = targetList.stream().filter((a)->a.getId() == lElement.getPcbId());
-                PcbBoard lPcb = Generic.getWithId(aInTargetList, lElement.getPcbId());
+                PcbBoard lPcb = CommonUtils.getWithId(aInTargetList, lElement.getPcbId());
                 if(lElement.getCount() != 0) {
                     int newCount = lPcb.getCount() - dup * lElement.getCount();
                     if(newCount < 0) {
@@ -94,6 +101,22 @@ public class Fit {
                 }
             }
         }
-        return new WorkOrder(lPartern, dup + 1);
+        return new WorkOrder(lPartern, dup + 1, usedPercent);
+    }
+
+    /**
+     * take a decisison random to add the pcb or not based on the count of the pcb in the aInTargetList
+     * @param aInPcb
+     * @param aInTargetList
+     * @return
+     */
+    private boolean doAdd(PcbBoard aInPcb, ArrayList<PcbBoard> aInTargetList) {
+        int lTotalCount = 0;
+        for(PcbBoard lpcb : aInTargetList) {
+            lTotalCount = lTotalCount + lpcb.getCount();
+        }
+        Random lRand  = new Random();
+        int lDice = lRand.nextInt(lTotalCount);
+        return lDice <= aInPcb.getCount();
     }
 }

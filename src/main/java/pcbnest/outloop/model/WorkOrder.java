@@ -1,18 +1,15 @@
 package pcbnest.outloop.model;
 
 
-import pcbnest.outloop.utils.Comparators;
-
-import java.util.ArrayList;
-import java.util.Collections;
-
 public class WorkOrder {
     private Partern partern;
-    int dups = 0;
+    private int dups = 0;
+    private Double usagePercent = 0.0;
 
-    public WorkOrder(Partern partern, int dups) {
+    public WorkOrder(Partern partern, int dups, double usagePercent) {
         this.partern = partern;
         this.dups = dups;
+        this.usagePercent = usagePercent;
     }
 
     public Partern getPartern() {
@@ -38,7 +35,8 @@ public class WorkOrder {
 
     public String toString() {
         String lStr =
-                "Dups = " + dups + "; partern : " + partern.toString();
+                "Dups = " + dups + "; partern : " + partern.toString() + "; Usage Percent =  " + (usagePercent + "%") ;
         return lStr;
     }
+
 }

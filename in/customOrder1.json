@@ -1,0 +1,25 @@
+{
+  "pcbBoards" : [ {
+    "area" : 50.0,
+    "count" : 200,
+    "id" : "board3"
+  }, {
+    "area" : 100.0,
+    "count" : 200,
+    "id" : "board2"
+  }, {
+    "area" : 100.0,
+    "count" : 300,
+    "id" : "board1"
+  },
+    {
+      "area" : 20.0,
+      "count" : 500,
+      "id" : "board4"
+    } ],
+  "baseBoards" : [ {
+    "area" : 2000.0,
+    "id" : "mainBoard"
+  } ],
+  "maxFitRate" : 0.96
+}

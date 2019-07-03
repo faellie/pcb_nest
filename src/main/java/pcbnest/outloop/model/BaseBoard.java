@@ -2,18 +2,21 @@ package pcbnest.outloop.model;
 
 
 public class BaseBoard extends Shape {
-    int id;
+    String id;
 
-    public BaseBoard(double area, int id) {
+    public BaseBoard(double area, String id) {
         super(area);
         this.id = id;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public BaseBoard() {
+    }
+
+    public void setId(String id) {
         this.id = id;
     }
 }

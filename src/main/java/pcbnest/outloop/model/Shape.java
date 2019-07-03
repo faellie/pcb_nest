@@ -8,6 +8,9 @@ public class Shape {
         this.area = area;
     }
 
+    public Shape() {
+    }
+
     public double getArea() {
         return area;
     }
