@@ -34,6 +34,9 @@ public class Test1 {
             System.out.println("Custom Order : " + customOrder.toString());
             Fit lFit = new Fit(customOrder);
             lFit.doFit();
+            String out = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(lFit.getWorkOrders());
+           /* System.out.println("workorder in Json format : \n");
+            System.out.println(out);*/
         }
 
     }

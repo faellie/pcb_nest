@@ -43,4 +43,14 @@ public class PcbBoard extends Shape{
         }
         count --;
     }
+
+    public void decreCount(int decr) {
+        if(count <=0 ) {
+            System.out.println("Error : PcbBoard.decreCount(); count can not be < 0 ");
+        }
+        count = count - decr;
+        if(count < 0 ) {
+            System.out.println("Error : PcbBoard.decreCount(); count =  " + count + " after decr by " + decr );
+        }
+    }
 }

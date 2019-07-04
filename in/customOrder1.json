@@ -18,7 +18,7 @@
       "id" : "board4"
     } ],
   "baseBoards" : [ {
-    "area" : 2000.0,
+    "area" : 1500.0,
     "id" : "mainBoard"
   } ],
   "maxFitRate" : 0.96

@@ -2,22 +2,22 @@ package pcbnest.outloop.model;
 
 
 public class WorkOrder {
-    private Partern partern;
+    private Patern patern;
     private int dups = 0;
     private Double usagePercent = 0.0;
 
-    public WorkOrder(Partern partern, int dups, double usagePercent) {
-        this.partern = partern;
+    public WorkOrder(Patern patern, int dups, double usagePercent) {
+        this.patern = patern;
         this.dups = dups;
         this.usagePercent = usagePercent;
     }
 
-    public Partern getPartern() {
-        return partern;
+    public Patern getPatern() {
+        return patern;
     }
 
-    public void setPartern(Partern partern) {
-        this.partern = partern;
+    public void setPatern(Patern patern) {
+        this.patern = patern;
     }
 
     public int getDups() {
@@ -33,9 +33,9 @@ public class WorkOrder {
     }
 
 
-    public String toString() {
+    public String info() {
         String lStr =
-                "Dups = " + dups + "; partern : " + partern.toString() + "; Usage Percent =  " + (usagePercent + "%") ;
+                "Dups = " + dups + "; partern : " + patern.info() + "; Usage Percent =  " + (usagePercent*100) + "%" ;
         return lStr;
     }
 

@@ -30,7 +30,7 @@ public class CommonUtils {
     public static String printWorkOrders(ArrayList<WorkOrder> workOrders) {
         String lines = "\n\t";
         for(WorkOrder lWorkOrder : workOrders) {
-            lines = lines + lWorkOrder.toString() + "\n\t";
+            lines = lines + lWorkOrder.info() + "\n\t";
         }
         return lines;
     }
